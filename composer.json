@@ -26,7 +26,8 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "ApplicationTest\\": "module/Application/test/"
+            "ApplicationTest\\": "module/Application/test/",
+            "AlbumTest\\": "module/Album/test/"
         }
     },
     "scripts": {
@@ -59,5 +60,9 @@
             "laminas/laminas-component-installer": true,
             "laminas/laminas-skeleton-installer": true
         }
+    },
+    "require-dev": {
+        "laminas/laminas-test": "^4.0",
+        "phpunit/phpunit": "^9.5"
     }
 }
