@@ -1,3 +1,5 @@
 # Album
 
-Tutorial: https://docs.laminas.dev/tutorials/getting-started/overview/
+Tutorial: https://docs.laminas.dev/tutorials/in-depth-guide/first-module/
+
+In-Depth
