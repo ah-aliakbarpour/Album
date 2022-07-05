@@ -19,4 +19,11 @@ return [
         'user' => 'root',
         'password' => '1245',
     ],
+    'db_doctrine' => [
+        'dbname' => 'album',
+        'user' => 'root',
+        'password' => '1245',
+        'host' => 'localhost',
+        'driver' => 'pdo_mysql',
+    ]
 ];

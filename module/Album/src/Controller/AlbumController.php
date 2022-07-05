@@ -20,7 +20,7 @@ class AlbumController extends AbstractActionController
     public function indexAction()
     {
         return new ViewModel([
-            'albums' => $this->table->fetchAll(),
+            'albums' => $this->table->getAll(),
         ]);
     }
 
@@ -44,7 +44,7 @@ class AlbumController extends AbstractActionController
         }
 
         $album->exchangeArray($form->getData());
-        $this->table->saveAlbum($album);
+        $this->table->save($album);
         return $this->redirect()->toRoute('album');
     }
 
@@ -60,7 +60,7 @@ class AlbumController extends AbstractActionController
         // an exception if the album is not found, which should result
         // in redirecting to the landing page.
         try {
-            $album = $this->table->getAlbum($id);
+            $album = $this->table->find($id);
         } catch (\Exception $e) {
             return $this->redirect()->toRoute('album', ['action' => 'index']);
         }
@@ -84,7 +84,7 @@ class AlbumController extends AbstractActionController
         }
 
         try {
-            $this->table->saveAlbum($album);
+            $this->table->save($album);
         } catch (\Exception $e) {
         }
 
@@ -105,7 +105,7 @@ class AlbumController extends AbstractActionController
 
             if ($del == 'Yes') {
                 $id = (int) $request->getPost('id');
-                $this->table->deleteAlbum($id);
+                $this->table->delete($id);
             }
 
             // Redirect to list of albums
@@ -114,7 +114,7 @@ class AlbumController extends AbstractActionController
 
         return [
             'id'    => $id,
-            'album' => $this->table->getAlbum($id),
+            'album' => $this->table->find($id),
         ];
     }
 }

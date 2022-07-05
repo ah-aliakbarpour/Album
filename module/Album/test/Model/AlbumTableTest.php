@@ -22,12 +22,12 @@ class AlbumTableTest extends TestCase
         $resultSet = $this->prophesize(ResultSetInterface::class)->reveal();
         $this->tableGateway->select()->willReturn($resultSet);
 
-        $this->assertSame($resultSet, $this->albumTable->fetchAll());
+        $this->assertSame($resultSet, $this->albumTable->getAll());
     }
     public function testCanDeleteAnAlbumByItsId()
     {
         $this->tableGateway->delete(['id' => 123])->shouldBeCalled();
-        $this->albumTable->deleteAlbum(123);
+        $this->albumTable->delete(123);
     }
 
     public function testSaveAlbumWillInsertNewAlbumsIfTheyDontAlreadyHaveAnId()
@@ -40,7 +40,7 @@ class AlbumTableTest extends TestCase
         $album->exchangeArray($albumData);
 
         $this->tableGateway->insert($albumData)->shouldBeCalled();
-        $this->albumTable->saveAlbum($album);
+        $this->albumTable->save($album);
     }
 
     public function testSaveAlbumWillUpdateExistingAlbumsIfTheyAlreadyHaveAnId()
@@ -67,7 +67,7 @@ class AlbumTableTest extends TestCase
                 ['id' => 123]
             )->shouldBeCalled();
 
-        $this->albumTable->saveAlbum($album);
+        $this->albumTable->save($album);
     }
 
     public function testExceptionIsThrownWhenGettingNonExistentAlbum()
@@ -81,6 +81,6 @@ class AlbumTableTest extends TestCase
 
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Could not find row with identifier 123');
-        $this->albumTable->getAlbum(123);
+        $this->albumTable->find(123);
     }
 }
