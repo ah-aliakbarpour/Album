@@ -2,20 +2,18 @@
 
 namespace Album\Model;
 
-use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
-use Doctrine\DBAL\FetchMode;
+use Doctrine\DBAL\Query\QueryBuilder;
 use RuntimeException;
 
 class AlbumTable
 {
     public const TABLE_NAME = 'album';
-    protected \Doctrine\DBAL\Query\QueryBuilder $query;
+    protected QueryBuilder $query;
 
     public function __construct()
     {
         $connectionParams = (require 'config/autoload/global.php')['db_doctrine'];
-
         $conn = DriverManager::getConnection($connectionParams);
         $this->query = $conn->createQueryBuilder();
     }
@@ -27,8 +25,14 @@ class AlbumTable
 
         $result = $this->query->fetchAllAssociative();
 
-        var_dump($result);
-        return $result;
+        $albums = [];
+        foreach ($result as $data) {
+            $album =new Album();
+            $album->exchangeArray($data);
+            $albums[] = $album;
+        }
+
+        return $albums;
     }
 
     public function find($id)
@@ -38,11 +42,8 @@ class AlbumTable
         $this->query->select('*')
             ->from(self::TABLE_NAME)
             ->where('id = :id');
-
         $this->query->setParameter('id', $id);
-
         $result = $this->query->fetchAssociative();
-        var_dump($result);
 
         if (! $result) {
             throw new RuntimeException(sprintf(
@@ -51,25 +52,24 @@ class AlbumTable
             ));
         }
 
-        $resultObj = new \stdClass();
-        foreach ($result as $key => $value)
-            $resultObj->$key = $value;
+        $album =new Album();
+        $album->exchangeArray($result);
 
-        return $resultObj;
+        return $album;
     }
 
     public function save(Album $album)
     {
-        $data = [
-            'artist' => $album->artist,
-            'title'  => $album->title,
-        ];
-
         $id = (int) $album->id;
 
         if ($id === 0) {
-            $this->tableGateway->insert($data);
-            return;
+            return $this->query
+                ->insert(self::TABLE_NAME)
+                ->setValue('artist', ':artist')
+                ->setValue('title', ':title')
+                ->setParameter('artist', $album->artist)
+                ->setParameter('title', $album->title)
+                ->executeStatement();
         }
 
         try {
@@ -81,11 +81,21 @@ class AlbumTable
             ));
         }
 
-        $this->tableGateway->update($data, ['id' => $id]);
+        return $this->query
+            ->update(self::TABLE_NAME)
+            ->set('artist', ':artist')
+            ->set('title', ':title')
+            ->setParameter('artist', $album->artist)
+            ->setParameter('title', $album->title)
+            ->where('id = '.$id)
+            ->executeStatement();
     }
 
     public function delete($id)
     {
-        //$this->tableGateway->delete(['id' => (int) $id]);
+        return $this->query
+            ->delete(self::TABLE_NAME)
+            ->where('id = '.$id)
+            ->executeStatement();
     }
 }
