@@ -3,10 +3,12 @@
 namespace AlbumTest\Controller;
 
 use Album\Controller\AlbumController;
+use Album\Model\Album;
 use Album\Model\AlbumTable;
 use Laminas\ServiceManager\ServiceManager;
 use Laminas\Stdlib\ArrayUtils;
 use Laminas\Test\PHPUnit\Controller\AbstractHttpControllerTestCase;
+use Prophecy\Argument;
 
 class AlbumControllerTest extends AbstractHttpControllerTestCase
 {
@@ -64,5 +66,22 @@ class AlbumControllerTest extends AbstractHttpControllerTestCase
     {
         $this->albumTable = $this->prophesize(AlbumTable::class);
         return $this->albumTable;
+    }
+
+    public function testAddActionRedirectsAfterValidPost()
+    {
+        $this->albumTable
+            ->saveAlbum(Argument::type(Album::class))
+            ->shouldBeCalled();
+
+        $postData = [
+            'title'  => 'Led Zeppelin III',
+            'artist' => 'Led Zeppelin',
+            'id'     => '',
+        ];
+
+        $this->dispatch('/album/add', 'POST', $postData);
+        $this->assertResponseStatusCode(302);
+        $this->assertRedirectTo('/album');
     }
 }
