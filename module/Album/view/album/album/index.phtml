@@ -1,8 +1,5 @@
 <?php
 // module/Album/view/album/album/index.phtml:
-/**
- * @var $albums
- */
 
 $title = 'My albums';
 $this->headTitle($title);
@@ -18,7 +15,7 @@ $this->headTitle($title);
         <th>Artist</th>
         <th>&nbsp;</th>
     </tr>
-    <?php foreach ($albums as $album) : ?>
+    <?php foreach ($this->albums as $album) : ?>
         <tr>
             <td><?= $this->escapeHtml($album->title) ?></td>
             <td><?= $this->escapeHtml($album->artist) ?></td>
