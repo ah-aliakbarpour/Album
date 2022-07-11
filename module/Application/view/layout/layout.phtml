@@ -63,6 +63,8 @@
             </div>
         </nav>
         <div class="container">
+            <?= $this->partial('partial/flash.phtml', $this->flashMessenger()); ?>
+
             <?= $this->content ?>
             <hr>
             <footer>
