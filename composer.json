@@ -28,7 +28,8 @@
         "laminas/laminas-filter": "^2.14",
         "mezzio/mezzio-csrf": "^1.5",
         "laminas/laminas-i18n": "^2.15",
-        "laminas/laminas-mvc-plugin-flashmessenger": "^1.8"
+        "laminas/laminas-mvc-plugin-flashmessenger": "^1.8",
+        "laminas/laminas-form": "^3.2"
     },
     "autoload": {
         "psr-4": {
