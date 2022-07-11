@@ -23,6 +23,16 @@ return [
                     ],
                 ],
             ],
+            'login' => [
+                'type'    => Literal::class,
+                'options' => [
+                    'route' => '/login',
+                    'defaults' => [
+                        'controller' => Controller\AuthController::class,
+                        'action'     => 'create',
+                    ],
+                ],
+            ],
         ],
     ],
     'view_manager' => [
