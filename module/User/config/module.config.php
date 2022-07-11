@@ -3,12 +3,11 @@
 namespace User;
 
 use Laminas\Router\Http\Literal;
-use Laminas\ServiceManager\Factory\InvokableFactory;
 
 return [
     'controllers' => [
         'factories' => [
-            Controller\AuthController::class => InvokableFactory::class,
+            Controller\AuthController::class => Factory\AuthControllerFactory::class,
         ],
     ],
     'router' => [

@@ -101,7 +101,10 @@ $form->prepare();
 
             <!-- submit and csrf fields -->
             <div class="mb-3 float-right">
-
+                <?= $this->formHidden($form->get('csrf')); ?>
+                <div class="text-danger">
+                    <?= $this->formElementErrors($form->get('csrf')); ?>
+                </div>
 
                 <?= $this->formSubmit($form->get('create_account')); ?>
             </div>
