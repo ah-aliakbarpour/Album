@@ -3,13 +3,15 @@
 namespace User;
 
 use Laminas\Router\Http\Literal;
+use Laminas\Router\Http\Segment;
 use Laminas\ServiceManager\Factory\InvokableFactory;
 
 return [
     'controllers' => [
         'factories' => [
             Controller\AuthController::class => Factory\AuthControllerFactory::class,
-            Controller\LoginController::class => InvokableFactory::class,
+            Controller\LoginController::class => Factory\LoginControllerFactory::class,
+            Controller\ProfileController::class => Factory\ProfileControllerFactory::class,
         ],
     ],
     'router' => [
@@ -34,16 +36,33 @@ return [
                     ],
                 ],
             ],
+            'profile' => [
+                'type'    => Segment::class,
+                'options' => [
+                    'route' => '/profile[/:id[/:username]]',
+                    'constraints' => [
+                        'id' => '[0-9]+',
+                        'username' => '[a-zA-Z][a-zA-Z0-9_-]+'
+                    ],
+                    'defaults' => [
+                        'controller' => Controller\ProfileController::class,
+                        'action'     => 'index',
+                    ],
+                ],
+            ],
+            'logout' => [
+                'type'    => Literal::class,
+                'options' => [
+                    'route' => '/login',
+                    'defaults' => [
+                        'controller' => Controller\LoginController::class,
+                        'action'     => 'index',
+                    ],
+                ],
+            ],
         ],
     ],
     'view_manager' => [
-        'template_map' => [
-            'auth/create'   => __DIR__ . '/../view/user/auth/create.phtml',
-            'login/index'   => __DIR__ . '/../view/user/auth/login.phtml',
-            'password/forgot' => __DIR__ . '/../view/user/auth/forgot.phtml',
-            'password/reset' => __DIR__ . '/../view/user/auth/reset.phtml',
-            'profile/index' => __DIR__ . '/../view/user/profile/index.phtml',
-        ],
         'template_path_stack' => [
             'user' => __DIR__ . '/../view',
         ],

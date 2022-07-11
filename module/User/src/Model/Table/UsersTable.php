@@ -5,10 +5,12 @@ namespace User\Model\Table;
 use Laminas\Crypt\Password\Bcrypt;
 use Laminas\Db\Adapter\Adapter;
 use Laminas\Db\TableGateway\AbstractTableGateway;
+use Laminas\Hydrator\ClassMethodsHydrator;
 use Laminas\Validator;
 use Laminas\Filter;
 use Laminas\InputFilter;
 use Laminas\I18n;
+use User\Model\Entity\UserEntity;
 
 class UsersTable extends AbstractTableGateway
 {
@@ -314,4 +316,150 @@ class UsersTable extends AbstractTableGateway
 
 		return $inputFilter;
 	}
+
+    public function getLoginFormFilter()
+    {
+        $inputFilter = new InputFilter\InputFilter();
+        $factory = new InputFilter\Factory();
+
+        # filter and validate email
+        $inputFilter->add(
+            $factory->createInput(
+                [
+                    'name' => 'email',
+                    'required' => true,
+                    'filters' => [
+                        ['name' => Filter\StripTags::class],  # removes html tags
+                        ['name' => Filter\StringTrim::class],
+                        //['name' => Filter\StringToLower::class],
+                    ],
+                    'validators' => [
+                        ['name' => Validator\NotEmpty::class],
+                        [
+                            'name' => Validator\StringLength::class,
+                            'options' => [
+                                'min' => 6,
+                                'max' => 128,
+                                'messages' => [
+                                    Validator\StringLength::TOO_SHORT => 'Email address must have at least 6 characters!',
+                                    Validator\StringLength::TOO_LONG => 'Email address must have at most 128 characters!',
+                                ],
+                            ],
+                        ],
+                        ['name' => Validator\EmailAddress::class],
+                        [
+                            'name' => Validator\Db\RecordExists::class,
+                            'options' => [
+                                'table' => $this->table,
+                                'field' => 'email',
+                                'adapter' => $this->adapter,
+                            ],
+                        ],
+                    ],
+                ]
+            )
+        );
+
+        # filter and validate password
+        $inputFilter->add(
+            $factory->createInput(
+                [
+                    'name' => 'password',
+                    'required' => true,
+                    'filters' => [
+                        ['name' => Filter\StripTags::class],  # removes html tags
+                        ['name' => Filter\StringTrim::class],
+                    ],
+                    'validators' => [
+                        ['name' => Validator\NotEmpty::class],
+                        [
+                            'name' => Validator\StringLength::class,
+                            'options' => [
+                                'min' => 8,
+                                'max' => 25,
+                                'messages' => [
+                                    Validator\StringLength::TOO_SHORT => 'Password must have at least 8 characters!',
+                                    Validator\StringLength::TOO_LONG => 'Password must have at most 25 characters!',
+                                ],
+                            ],
+                        ],
+                    ],
+                ]
+            )
+        );
+
+        # recall checkbox
+        $inputFilter->add(
+            $factory->createInput(
+                [
+                    'name' => 'recall',
+                    'required' => true,
+                    'filters' => [
+                        ['name' => Filter\StripTags::class],  # removes html tags
+                        ['name' => Filter\StringTrim::class],
+                        ['name' => Filter\ToInt::class],
+                    ],
+                    'validators' => [
+                        ['name' => Validator\NotEmpty::class],
+                        ['name' => I18n\Validator\IsInt::class],
+                        [
+                            'name' => Validator\InArray::class,
+                            'options' => [
+                                'haystack' => [0, 1]
+                            ],
+                        ],
+                    ],
+                ]
+            )
+        );
+
+        # csrf
+        $inputFilter->add(
+            $factory->createInput(
+                [
+                    'name' => 'csrf',
+                    'required' => true,
+                    'filters' => [
+                        ['name' => Filter\StripTags::class],  # removes html tags
+                        ['name' => Filter\StringTrim::class],
+                    ],
+                    'validators' => [
+                        ['name' => Validator\NotEmpty::class],
+                        [
+                            'name' => Validator\Csrf::class,
+                            'options' => [
+                                'messages' => [
+                                    Validator\Csrf::NOT_SAME => 'Oops! Refill the form and try again',
+                                ],
+                            ],
+                        ],
+                    ],
+                ]
+            )
+        );
+
+        # be sure to return the input filter
+        return $inputFilter;
+    }
+
+
+
+    public function fetchAccountByEmail(string $email)
+    {
+        $sqlQuery = $this->sql->select()
+            ->join('roles', 'roles.role_id='.$this->table.'.role_id', ['role_id', 'role'])
+            ->where(['email' => $email]);
+        $sqlStmt = $this->sql->prepareStatementForSqlObject($sqlQuery);
+        $handler = $sqlStmt->execute()->current();
+
+        if(!$handler) {
+            return null;
+        }
+
+        $classMethod = new ClassMethodsHydrator();
+        $entity      = new UserEntity();
+        $classMethod->hydrate($handler, $entity);
+
+        return $entity;
+    }
 }

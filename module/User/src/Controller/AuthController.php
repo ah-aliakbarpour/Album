@@ -39,7 +39,7 @@ class AuthController extends AbstractActionController
                     $this->usersTable->saveAccount($data);
                     $this->flashMessenger()->addSuccessMessage('Account successfully created. You can now login');
 
-                    return $this->redirect()->toRoute('home');
+                    return $this->redirect()->toRoute('login');
                 } catch(RuntimeException $exception) {
                     $this->flashMessenger()->addErrorMessage($exception->getMessage());
                     return $this->redirect()->refresh();
