@@ -12,6 +12,7 @@ return [
             Controller\AuthController::class => Factory\AuthControllerFactory::class,
             Controller\LoginController::class => Factory\LoginControllerFactory::class,
             Controller\ProfileController::class => Factory\ProfileControllerFactory::class,
+            Controller\LogoutController::class => InvokableFactory::class,
         ],
     ],
     'router' => [
@@ -53,9 +54,9 @@ return [
             'logout' => [
                 'type'    => Literal::class,
                 'options' => [
-                    'route' => '/login',
+                    'route' => '/logout',
                     'defaults' => [
-                        'controller' => Controller\LoginController::class,
+                        'controller' => Controller\LogoutController::class,
                         'action'     => 'index',
                     ],
                 ],
